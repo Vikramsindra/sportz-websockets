@@ -5,28 +5,25 @@ const arcjetMode = process.env.ARCJET_MODE === 'DRY_RUN' ? 'DRY_RUN' : 'LIVE';
 
 if (!arcjetKey) throw new Error('ARCJET_KEY environment variable is missing ');
 
-export const httpArcjet = arcjetKey ?
-    arcjet({
-        key: arcjetKey,
-        rules: [
-            shield({ mode: arcjetMode }),
-            // detectBot({ mode: arcjetMode, allow: ['CATEGORY:SEARCH_ENGINE', "CATEGORY:PREVIEW"] }),
-            slidingWindow({ mode: arcjetMode, interval: '10s', max: 50 }),
-        ]
-    })
-    : null;
+export const httpArcjet = arcjet({
+    key: arcjetKey,
+    rules: [
+        shield({ mode: arcjetMode }),
+        // detectBot({ mode: arcjetMode, allow: ['CATEGORY:SEARCH_ENGINE', "CATEGORY:PREVIEW"] }),
+        slidingWindow({ mode: arcjetMode, interval: '10s', max: 50 }),
+    ]
+});
 
 
-export const wsArcjet = arcjetKey ?
-    arcjet({
-        key: arcjetKey,
-        rules: [
-            shield({ mode: arcjetMode }),
-            detectBot({ mode: arcjetMode, allow: ['CATEGORY:SEARCH_ENGINE', "CATEGORY:PREVIEW"] }),
-            slidingWindow({ mode: arcjetMode, interval: '2s', max: 5 }),
-        ]
-    })
-    : null;
+export const wsArcjet = arcjet({
+    key: arcjetKey,
+    rules: [
+        shield({ mode: arcjetMode }),
+        detectBot({ mode: arcjetMode, allow: ['CATEGORY:SEARCH_ENGINE', "CATEGORY:PREVIEW"] }),
+        slidingWindow({ mode: arcjetMode, interval: '2s', max: 5 }),
+    ]
+})
+    ;
 
 
 export function securityMiddleware() {
@@ -40,7 +37,7 @@ export function securityMiddleware() {
 
             if (decision.isDenied()) {
                 if (decision.reason.isRateLimit()) {
-                    return res.status(429).json({ error: "Too many request" });
+                    return res.status(429).json({ error: "Too many requests" });
                 }
 
                 return res.status(403).json({ error: "Forbidden" });
@@ -49,7 +46,7 @@ export function securityMiddleware() {
 
         } catch (error) {
             console.log('ARCJET middleware error');
-            res.status(500).json({ error: 'Services Unavailble' });
+            return res.status(500).json({ error: 'Services Unavailble' });
         }
 
         next();

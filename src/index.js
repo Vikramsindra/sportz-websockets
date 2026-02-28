@@ -12,12 +12,11 @@ const port = 8000;
 const host = '0.0.0.0'
 
 app.use(express.json());
+app.use(securityMiddleware());
 
 app.get("/", (req, res) => {
     res.send("server is working")
 });
-
-app.use(securityMiddleware());
 
 app.use("/matches", matchRouter);
 
